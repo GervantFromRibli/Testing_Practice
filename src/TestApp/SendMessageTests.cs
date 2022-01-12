@@ -33,7 +33,6 @@ namespace TestApp
             firstUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
             secondUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
 
-            // Act 1
             firstUserDriver.Navigate().GoToUrl(TestSettings.LoginPage);
             var email = firstUserDriver.FindElement(By.XPath("//input[@type=\"email\"]"));
             email.SendKeys(TestSettings.FirstUserEmail);
@@ -49,11 +48,6 @@ namespace TestApp
             wait.Until(ExpectedConditions.UrlContains("myaccount"));
 
             firstUserDriver.Navigate().GoToUrl(TestSettings.GmailUrl);
-            firstUserDriver.FindElement(By.XPath("//div[@class=\"T-I T-I-KE L3\"]")).Click();
-
-            firstUserDriver.FindElement(By.XPath("//textarea[@name=\"to\"]")).SendKeys(TestSettings.SecondUserEmail);
-            firstUserDriver.FindElement(By.XPath("//div[@class=\"Am Al editable LW-avf tS-tW\"]")).SendKeys(TestSettings.MessageToSend);
-            firstUserDriver.FindElement(By.XPath("//div[@class=\"T-I J-J5-Ji aoO v7 T-I-atl L3\"]")).Click();
 
             secondUserDriver.Navigate().GoToUrl(TestSettings.MailLoginUrl);
 
@@ -61,8 +55,16 @@ namespace TestApp
             secondUserDriver.FindElement(By.XPath("//button[@data-testid=\"enter-password\"]")).Click();
             secondUserDriver.FindElement(By.XPath("//input[@name=\"password\"]")).SendKeys(TestSettings.SecondUserPassword);
             secondUserDriver.FindElement(By.XPath("//button[@data-testid=\"login-to-mail\"]")).Click();
-            
+
             secondUserDriver.Navigate().GoToUrl(TestSettings.MailUrl);
+
+            // Act 1
+            firstUserDriver.FindElement(By.XPath("//div[@class=\"T-I T-I-KE L3\"]")).Click();
+
+            firstUserDriver.FindElement(By.XPath("//textarea[@name=\"to\"]")).SendKeys(TestSettings.SecondUserEmail);
+            firstUserDriver.FindElement(By.XPath("//div[@class=\"Am Al editable LW-avf tS-tW\"]")).SendKeys(TestSettings.MessageToSend);
+            firstUserDriver.FindElement(By.XPath("//div[@class=\"T-I J-J5-Ji aoO v7 T-I-atl L3\"]")).Click();
+
             wait = new WebDriverWait(secondUserDriver, TestSettings.ImplicitWaitSpan);
             wait.Until(ExpectedConditions.UrlContains(TestSettings.MailUrl));
             Thread.Sleep(15000);
@@ -80,12 +82,13 @@ namespace TestApp
             secondUserDriver.Close();
             wait = new WebDriverWait(firstUserDriver, TestSettings.ImplicitWaitSpan);
 
-            Thread.Sleep(65000);
-            firstUserDriver.FindElements(By.XPath("//tr[@class=\"zA zE\"]"))[0].Click();
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class=\"a3s aiL \"]/child::div[2]/div[1]")));
-            message = firstUserDriver.FindElement(By.XPath("//div[@class=\"a3s aiL \"]/child::div[2]/div[1]")).GetAttribute("innerText");
+            Thread.Sleep(70000);
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//tbody/child::tr[1]")));
+            firstUserDriver.FindElements(By.XPath("//tbody/child::tr[1]"))[5].Click();
 
             // Assert 2
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class=\"a3s aiL \"]/child::div[2]/div[1]")));
+            message = firstUserDriver.FindElement(By.XPath("//div[@class=\"a3s aiL \"]/child::div[2]/div[1]")).GetAttribute("innerText");
             message.Should().BeEquivalentTo(TestSettings.NewPseudonym);
             firstUserDriver.Close();
         }

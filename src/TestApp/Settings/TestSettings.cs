@@ -27,5 +27,9 @@ namespace TestApp.Settings
         public static readonly string MailUrl = "https://e.mail.ru/inbox/";
 
         public static readonly string NewPseudonym = "IAmNew";
+
+        public static readonly string AccountUrl = "https://myaccount.google.com/";
+
+        public static readonly string OldNickName = "TestName";
     }
 }
