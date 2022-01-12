@@ -6,7 +6,6 @@ using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
 using System.IO;
-using System.Threading;
 using TestApp.Settings;
 
 namespace TestApp

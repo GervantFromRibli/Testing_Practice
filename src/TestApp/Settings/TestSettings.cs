@@ -13,5 +13,19 @@ namespace TestApp.Settings
         public static readonly string FirstUserPassword = "Abcd_123";
 
         public static readonly string ExpectedAccountUrl = "https://myaccount.google.com/?utm_source=sign_in_no_continue&pli=1";
+
+        public static readonly string SecondUserEmail = "testsurname299@mail.ru";
+
+        public static readonly string SecondUserPassword = "Abcd_3_test";
+
+        public static readonly string GmailUrl = "https://mail.google.com/mail";
+
+        public static readonly string MessageToSend = "Hello, brother in test!";
+
+        public static readonly string MailLoginUrl = "https://mail.ru/";
+
+        public static readonly string MailUrl = "https://e.mail.ru/inbox/";
+
+        public static readonly string NewPseudonym = "IAmNew";
     }
 }
