@@ -5,22 +5,21 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
-using System.IO;
+using TestApp.Services;
 using TestApp.Settings;
+using TestApp.Utils;
 
 namespace TestApp
 {
     [TestFixture]
     public class LoginTests
     {
-        public string driverPath;
+        private string driverPath;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            driverPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.
-                GetCurrentDirectory()).ToString()).ToString()).ToString();
-            driverPath = Path.Combine(driverPath, "Settings//Driver");
+            driverPath = TestStringUtils.GetPathToDriver();
         }
 
         [Test]
@@ -30,20 +29,10 @@ namespace TestApp
             var driver = new ChromeDriver(driverPath);
             driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
 
+            var user = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestSettings.FirstUserPassword);
+
             // Act
-            driver.Navigate().GoToUrl(TestSettings.LoginPage);
-            var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
-            email.SendKeys(TestSettings.FirstUserEmail);
-
-            var buttonSubmit = driver.FindElement(By.ClassName("VfPpkd-LgbsSe"));
-            buttonSubmit.Click();
-
-            var password = driver.FindElement(By.Name("password"));
-            password.SendKeys(TestSettings.FirstUserPassword);
-            password.SendKeys(Keys.Enter);
-
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.UrlContains("myaccount"));
+            driver.GmailLogin(user);
 
             // Assert
             driver.Url.Should().BeEquivalentTo(TestSettings.ExpectedAccountUrl);
@@ -55,14 +44,12 @@ namespace TestApp
         {
             // Arrange
             var driver = new ChromeDriver(driverPath);
+            driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+
+            var user = CreateUserService.CreateUserWithNoLoginAndPassword();
 
             // Act
-            driver.Navigate().GoToUrl(TestSettings.LoginPage);
-            var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
-            email.SendKeys(string.Empty);
-
-            var buttonSubmit = driver.FindElement(By.ClassName("VfPpkd-LgbsSe"));
-            buttonSubmit.Click();
+            driver.GmailLogin(user);
 
             var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
             var warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@class=\"o6cuMc\"]")));
@@ -77,19 +64,11 @@ namespace TestApp
         {
             // Arrange
             var driver = new ChromeDriver(driverPath);
-            driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+
+            var user = CreateUserService.CreateUserWithNoPassword(TestSettings.FirstUserEmail);
 
             // Act
-            driver.Navigate().GoToUrl(TestSettings.LoginPage);
-            var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
-            email.SendKeys(TestSettings.FirstUserEmail);
-
-            var buttonSubmit = driver.FindElement(By.ClassName("VfPpkd-LgbsSe"));
-            buttonSubmit.Click();
-
-            var password = driver.FindElement(By.Name("password"));
-            password.SendKeys(string.Empty);
-            password.SendKeys(Keys.Enter);
+            driver.GmailLogin(user);
 
             var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
             var warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@jsname=\"B34EJ\"]/child::span")));
@@ -106,17 +85,14 @@ namespace TestApp
             var driver = new ChromeDriver(driverPath);
             driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
 
-            // Act
-            driver.Navigate().GoToUrl(TestSettings.LoginPage);
-            var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
-            email.SendKeys(new string('w', 10));
+            var user = CreateUserService.CreateUserWithNoPassword(TestStringUtils.GenerateString());
 
-            var buttonSubmit = driver.FindElement(By.ClassName("VfPpkd-LgbsSe"));
-            buttonSubmit.Click();
+            // Act
+            driver.GmailLogin(user);
 
             var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
-            var isWarningExist = wait.Until(e => e.FindElement(By.XPath("//h1[@class=\"ahT6S \"]/child::span")).
-                GetAttribute("innerText").Contains("Не удалось войти в аккаунт"));
+            var isWarningExist = wait.Until(e => e.FindElement(By.XPath("//div[@class=\"o6cuMc\"]")).
+                GetAttribute("innerText").Contains("Не удалось найти аккаунт Google."));
 
             // Assert
             isWarningExist.Should().BeTrue();
@@ -130,17 +106,10 @@ namespace TestApp
             var driver = new ChromeDriver(driverPath);
             driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
 
+            var user = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestStringUtils.GenerateString());
+
             // Act
-            driver.Navigate().GoToUrl(TestSettings.LoginPage);
-            var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
-            email.SendKeys(TestSettings.FirstUserEmail);
-
-            var buttonSubmit = driver.FindElement(By.ClassName("VfPpkd-LgbsSe"));
-            buttonSubmit.Click();
-
-            var password = driver.FindElement(By.Name("password"));
-            password.SendKeys("dwawdaw");
-            password.SendKeys(Keys.Enter);
+            driver.GmailLogin(user);
 
             var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
             var warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@jsname=\"B34EJ\"]/child::span")));
