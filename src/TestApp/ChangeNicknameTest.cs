@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
+using NLog;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -15,24 +17,37 @@ namespace TestApp
     [TestFixture]
     public class ChangeNicknameTest
     {
-        public string driverPath;
+        private string driverPath;
 
-        public IWebDriver driver;
+        private IWebDriver driver;
+
+        private Logger Logger;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            driverPath = TestStringUtils.GetPathToDriver();
+            driverPath = PathUtil.GetPathToDriver();
 
             driver = new ChromeDriver(driverPath);
             driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
             driver.Manage().Window.Maximize();
+
+            Logger = LoggerManager.GetLogger();
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            driver.ChangeGmailAccountNickName(TestSettings.OldNickName);
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            {
+                ((ChromeDriver)driver).MakeScreenshot();
+                Logger.Error(TestContext.CurrentContext.Result.Message);
+            }
+            else
+            {
+                driver.ChangeGmailAccountNickName(TestSettings.OldNickName);
+            }
+            
             driver.Close();
         }
 
@@ -48,19 +63,30 @@ namespace TestApp
 
             var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
 
+            string welcome = string.Empty;
+
             // Act
-            var newNickName = driver.ReadGmailMessage();
+            try
+            {
+                var newNickName = driver.ReadGmailMessage();
 
-            driver.ChangeGmailAccountNickName(newNickName);
+                driver.ChangeGmailAccountNickName(newNickName);
 
-            Thread.Sleep(1000);
-            driver.Navigate().GoToUrl(TestSettings.AccountUrl);
-            wait.Until(ExpectedConditions.ElementExists(By.XPath("//h1[@class=\"x7WrMb\"]")));
+                Thread.Sleep(1000);
+                driver.Navigate().GoToUrl(TestSettings.AccountUrl);
+                wait.Until(ExpectedConditions.ElementExists(By.XPath("//h1[@class=\"x7WrMb\"]")));
 
-            var welcome = driver.FindElement(By.XPath("//h1[@class=\"x7WrMb\"]")).GetAttribute("innerHTML");
+                welcome = driver.FindElement(By.XPath("//h1[@class=\"x7WrMb\"]")).GetAttribute("innerHTML");
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex.Message);
+                throw;
+            }
 
             // Assert
             welcome.Should().BeEquivalentTo(expectedWelcome);
+            Logger.Info("ChangeNickname_WhenAllDataAreValid_ShouldSetNewNickname executed successfully.");
         }
     }
 }

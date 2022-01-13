@@ -1,6 +1,10 @@
 ﻿using FluentAssertions;
+using NLog;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using System;
 using System.Threading;
 using TestApp.Models;
 using TestApp.Services;
@@ -12,23 +16,45 @@ namespace TestApp
     [TestFixture]
     public class SendMessageTests
     {
-        public string driverPath;
+        private string driverPath;
+
+        private Logger Logger;
+
+        private IWebDriver firstUserDriver;
+
+        private IWebDriver secondUserDriver;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            driverPath = TestStringUtils.GetPathToDriver();
+            driverPath = PathUtil.GetPathToDriver();
+
+            firstUserDriver = new ChromeDriver(driverPath);
+            secondUserDriver = new ChromeDriver(driverPath);
+            firstUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+            secondUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+
+            Logger = LoggerManager.GetLogger();
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            {
+                ((ChromeDriver)firstUserDriver).MakeScreenshot();
+                ((ChromeDriver)secondUserDriver).MakeScreenshot();
+                Logger.Error(TestContext.CurrentContext.Result.Message);
+            }
+
+            secondUserDriver.Close();
+            firstUserDriver.Close();
         }
 
         [Test]
         public void SendMessage_WhenAllDataAreValid_ShouldSendAndReceiveMessages()
         {
             // Arrange
-            var firstUserDriver = new ChromeDriver(driverPath);
-            var secondUserDriver = new ChromeDriver(driverPath);
-            firstUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
-            secondUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
-
             var firstUser = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestSettings.FirstUserPassword);
             var secondUser = CreateUserService.CreateUserWithCredentials(TestSettings.SecondUserEmail, TestSettings.SecondUserPassword);
             var firstMessage = new Message
@@ -45,24 +71,42 @@ namespace TestApp
             firstUserDriver.GmailLogin(firstUser);
             secondUserDriver.MailLogin(secondUser);
 
+            string message;
+
             // Act 1
-            firstUserDriver.GmailSendMessage(firstMessage);
-            Thread.Sleep(15000);
-            var message = secondUserDriver.ReadMailMessage();
+            try
+            {
+                firstUserDriver.GmailSendMessage(firstMessage);
+                Thread.Sleep(15000);
+                message = secondUserDriver.ReadMailMessage();
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex.Message);
+                throw;
+            }
 
             // Assert 1
             message.Should().BeEquivalentTo(TestSettings.MessageToSend);
 
             // Act 2
-            secondUserDriver.MailSendMessage(secondMessage);
+            try
+            {
+                secondUserDriver.MailSendMessage(secondMessage);
 
-            secondUserDriver.Close();
-            Thread.Sleep(70000);
+                Thread.Sleep(70000);
 
-            message = firstUserDriver.ReadGmailMessage();
+                message = firstUserDriver.ReadGmailMessage();
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex.Message);
+                throw;
+            }
+            
             // Assert 2
             message.Should().BeEquivalentTo(TestSettings.NewPseudonym);
-            firstUserDriver.Close();
+            
         }
     }
 }
