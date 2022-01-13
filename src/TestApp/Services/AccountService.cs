@@ -20,7 +20,7 @@ namespace TestApp.Services
                 nameField.Clear();
                 nameField.SendKeys(nickName);
                 nameField.SendKeys(Keys.Enter);
-                logger.Info("Account nickname changed successfully.");S
+                logger.Info("Account nickname changed successfully.");
             }
             catch(Exception ex)
             {
