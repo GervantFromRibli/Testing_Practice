@@ -1,0 +1,16 @@
+{
+  "LoginPage": "https://accounts.google.com/signin",
+  "FirstUserEmail": "ttestname99@gmail.com",
+  "FirstUserPassword": "Abcd_123",
+  "ExpectedAccountUrl": "https://myaccount.google.com/?utm_source=sign_in_no_continue&pli=1",
+  "SecondUserEmail": "testsurname299@mail.ru",
+  "SecondUserPassword": "Abcd_3_test",
+  "GmailUrl": "https://mail.google.com/mail",
+  "MessageToSend": "Goodbye, never see you again",
+  "MailLoginUrl": "https://mail.ru/",
+  "MailUrl": "https://e.mail.ru/inbox/",
+  "NewPseudonym": "IAmOld",
+  "AccountUrl": "https://myaccount.google.com/",
+  "OldNickName": "TestName",
+  "ImplicitWaitSpan": 20
+}

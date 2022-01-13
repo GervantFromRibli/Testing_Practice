@@ -26,7 +26,7 @@ namespace TestApp.Services
                 var password = driver.FindElement(By.XPath("//input[@type=\"password\"]"));
                 password.SendKeys(user.Password);
                 password.SendKeys(Keys.Enter);
-                wait.Until(ExpectedConditions.UrlContains("myaccount"));
+                wait.Until(ExpectedConditions.UrlContains(TestSettings.AccountUrl));
             }
             catch (WebDriverTimeoutException)
             {
