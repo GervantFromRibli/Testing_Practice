@@ -13,7 +13,7 @@ using TestApp.Utils;
 
 namespace TestApp
 {
-    [TestFixture]
+    [TestFixture, Category("All"), Category("SmokeTests")]
     public class LoginTests
     {
         private string driverPath;

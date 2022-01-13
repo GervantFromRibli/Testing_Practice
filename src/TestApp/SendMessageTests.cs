@@ -13,7 +13,7 @@ using TestApp.Utils;
 
 namespace TestApp
 {
-    [TestFixture]
+    [TestFixture, Category("All")]
     public class SendMessageTests
     {
         private string driverPath;

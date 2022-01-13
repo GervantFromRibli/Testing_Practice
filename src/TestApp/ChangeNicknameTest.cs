@@ -14,7 +14,7 @@ using TestApp.Utils;
 
 namespace TestApp
 {
-    [TestFixture]
+    [TestFixture, Category("All")]
     public class ChangeNicknameTest
     {
         private string driverPath;
