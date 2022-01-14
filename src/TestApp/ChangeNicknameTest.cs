@@ -9,7 +9,6 @@ using SeleniumExtras.WaitHelpers;
 using System;
 using System.Threading;
 using TestApp.Services;
-using TestApp.Settings;
 using TestApp.Utils;
 
 namespace TestApp
@@ -26,10 +25,12 @@ namespace TestApp
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            SettingsService.SetSettings();
+
             driverPath = PathUtil.GetPathToDriver();
 
             driver = new ChromeDriver(driverPath);
-            driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+            driver.Manage().Timeouts().ImplicitWait = SettingsService.ImplicitWaitSpan;
             driver.Manage().Window.Maximize();
 
             Logger = LoggerManager.GetLogger();
@@ -45,7 +46,7 @@ namespace TestApp
             }
             else
             {
-                driver.ChangeGmailAccountNickName(TestSettings.OldNickName);
+                driver.ChangeGmailAccountNickName(SettingsService.OldNickName);
             }
             
             driver.Close();
@@ -55,13 +56,13 @@ namespace TestApp
         public void ChangeNickname_WhenAllDataAreValid_ShouldSetNewNickname()
         {
             // Arrange
-            var expectedWelcome = "Добро пожаловать, " + TestSettings.NewPseudonym + " TestSurname!";
+            var expectedWelcome = "Добро пожаловать, " + SettingsService.NewPseudonym + " TestSurname!";
 
-            var user = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestSettings.FirstUserPassword);
+            var user = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, SettingsService.FirstUserPassword);
 
             driver.GmailLogin(user);
 
-            var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+            var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
 
             string welcome = string.Empty;
 
@@ -73,7 +74,7 @@ namespace TestApp
                 driver.ChangeGmailAccountNickName(newNickName);
 
                 Thread.Sleep(1000);
-                driver.Navigate().GoToUrl(TestSettings.AccountUrl);
+                driver.Navigate().GoToUrl(SettingsService.AccountUrl);
                 wait.Until(ExpectedConditions.ElementExists(By.XPath("//h1[@class=\"x7WrMb\"]")));
 
                 welcome = driver.FindElement(By.XPath("//h1[@class=\"x7WrMb\"]")).GetAttribute("innerHTML");

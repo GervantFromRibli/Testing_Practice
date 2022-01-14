@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace TestApp.Utils
 {
@@ -34,6 +29,16 @@ namespace TestApp.Utils
             logPath = Path.Combine(logPath, "Settings//Log//log.txt");
 
             return logPath;
+        }
+
+        public static string GetPathToData(string environment)
+        {
+            var dataPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.
+                GetCurrentDirectory()).ToString()).ToString()).ToString();
+            var fileShortPath = $"Settings//Test_Data//{environment}.json";
+            dataPath = Path.Combine(dataPath, fileShortPath);
+
+            return dataPath;
         }
     }
 }

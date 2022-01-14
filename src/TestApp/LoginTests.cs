@@ -8,7 +8,6 @@ using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
 using TestApp.Services;
-using TestApp.Settings;
 using TestApp.Utils;
 
 namespace TestApp
@@ -25,6 +24,8 @@ namespace TestApp
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            SettingsService.SetSettings();
+
             driverPath = PathUtil.GetPathToDriver();
 
             Logger = LoggerManager.GetLogger();
@@ -34,7 +35,7 @@ namespace TestApp
         public void SetUp()
         {
             driver = new ChromeDriver(driverPath);
-            driver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+            driver.Manage().Timeouts().ImplicitWait = SettingsService.ImplicitWaitSpan;
         }
 
         [TearDown]
@@ -53,7 +54,7 @@ namespace TestApp
         public void LoginTest_WhenAllDataAreCorrect_ShouldRedirectToPage()
         {
             // Arrange
-            var user = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestSettings.FirstUserPassword);
+            var user = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, SettingsService.FirstUserPassword);
 
             try
             {
@@ -67,7 +68,7 @@ namespace TestApp
             }
 
             // Assert
-            driver.Url.Should().BeEquivalentTo(TestSettings.ExpectedAccountUrl);
+            driver.Url.Should().BeEquivalentTo(SettingsService.ExpectedAccountUrl);
             Logger.Info("LoginTest_WhenAllDataAreCorrect_ShouldRedirectToPage executed successfully.");
         }
 
@@ -84,7 +85,7 @@ namespace TestApp
             {
                 driver.GmailLoginWithoutPassword(user);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
                 warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@class=\"o6cuMc\"]")));
             }
             catch(Exception ex)
@@ -102,7 +103,7 @@ namespace TestApp
         public void LoginTest_WhenNoPasswordSent_ShouldCreateWarning()
         {
             // Arrange
-            var user = CreateUserService.CreateUserWithNoPassword(TestSettings.FirstUserEmail);
+            var user = CreateUserService.CreateUserWithNoPassword(SettingsService.FirstUserEmail);
 
             IWebElement warning = null;
 
@@ -111,7 +112,7 @@ namespace TestApp
             {
                 driver.GmailLoginWithoutRedirection(user);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
                 warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@jsname=\"B34EJ\"]/child::span")));
             }
             catch(Exception ex)
@@ -138,7 +139,7 @@ namespace TestApp
             {
                 driver.GmailLoginWithoutPassword(user);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
                 isWarningExist = wait.Until(e => e.FindElement(By.XPath("//div[@class=\"o6cuMc\"]")).
                     GetAttribute("innerText").Contains("Не удалось найти аккаунт Google."));
             }
@@ -157,7 +158,7 @@ namespace TestApp
         public void LoginTest_WhenPasswordIsWrong_ShouldCreateWarning()
         {
             // Arrange
-            var user = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestStringUtil.GenerateString());
+            var user = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, TestStringUtil.GenerateString());
 
             IWebElement warning = null;
 
@@ -166,7 +167,7 @@ namespace TestApp
             {
                 driver.GmailLoginWithoutRedirection(user);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
                 warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@jsname=\"B34EJ\"]/child::span")));
             }
             catch(Exception ex)

@@ -4,7 +4,6 @@ using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
 using TestApp.Models;
-using TestApp.Settings;
 
 namespace TestApp.Services
 {
@@ -16,7 +15,7 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.LoginPage);
+                driver.Navigate().GoToUrl(SettingsService.LoginPage);
                 var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
                 email.SendKeys(user.Login);
 
@@ -29,7 +28,7 @@ namespace TestApp.Services
                 var password = driver.FindElement(By.XPath("//input[@type=\"password\"]"));
                 password.SendKeys(user.Password);
                 password.SendKeys(Keys.Enter);
-                wait.Until(ExpectedConditions.UrlContains(TestSettings.AccountUrl));
+                wait.Until(ExpectedConditions.UrlContains(SettingsService.AccountUrl));
                 logger.Info($"User {user.Login} successfully logged in.");
             }
             catch(Exception ex)
@@ -44,7 +43,7 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.LoginPage);
+                driver.Navigate().GoToUrl(SettingsService.LoginPage);
                 var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
                 email.SendKeys(user.Login);
 
@@ -64,7 +63,7 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.LoginPage);
+                driver.Navigate().GoToUrl(SettingsService.LoginPage);
                 var email = driver.FindElement(By.XPath("//input[@type=\"email\"]"));
                 email.SendKeys(user.Login);
 
@@ -91,7 +90,7 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.MailLoginUrl);
+                driver.Navigate().GoToUrl(SettingsService.MailLoginUrl);
 
                 driver.FindElement(By.XPath("//input[@name=\"login\"]")).SendKeys(user.Login);
                 driver.FindElement(By.XPath("//button[@data-testid=\"enter-password\"]")).Click();

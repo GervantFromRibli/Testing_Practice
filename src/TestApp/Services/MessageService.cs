@@ -3,13 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using TestApp.Models;
-using TestApp.Settings;
 
 namespace TestApp.Services
 {
@@ -21,7 +15,7 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.GmailUrl);
+                driver.Navigate().GoToUrl(SettingsService.GmailUrl);
 
                 driver.FindElement(By.XPath("//div[@class=\"T-I T-I-KE L3\"]")).Click();
 
@@ -42,9 +36,9 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.MailUrl);
+                driver.Navigate().GoToUrl(SettingsService.MailUrl);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
                 wait.Until(ExpectedConditions.ElementExists(By.XPath("//a[@data-title-shortcut=\"N\"]")));
 
                 driver.FindElement(By.XPath("//a[@data-title-shortcut=\"N\"]")).Click();
@@ -66,10 +60,10 @@ namespace TestApp.Services
             string message = string.Empty;
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.MailUrl);
+                driver.Navigate().GoToUrl(SettingsService.MailUrl);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
-                wait.Until(ExpectedConditions.UrlContains(TestSettings.MailUrl));
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
+                wait.Until(ExpectedConditions.UrlContains(SettingsService.MailUrl));
 
                 message = driver.FindElements(By.XPath("//span[@class=\"llc__snippet\"]"))[0].GetAttribute("innerText");
                 logger.Info("Message read successfully.");
@@ -87,9 +81,9 @@ namespace TestApp.Services
             string message = string.Empty;
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.GmailUrl);
+                driver.Navigate().GoToUrl(SettingsService.GmailUrl);
 
-                var wait = new WebDriverWait(driver, TestSettings.ImplicitWaitSpan);
+                var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
                 wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//tbody/child::tr[1]")));
                 driver.FindElements(By.XPath("//tbody/child::tr[1]"))[5].Click();
 

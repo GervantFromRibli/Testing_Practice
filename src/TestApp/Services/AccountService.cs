@@ -1,7 +1,6 @@
 ﻿using NLog;
 using OpenQA.Selenium;
 using System;
-using TestApp.Settings;
 
 namespace TestApp.Services
 {
@@ -13,7 +12,7 @@ namespace TestApp.Services
         {
             try
             {
-                driver.Navigate().GoToUrl(TestSettings.AccountUrl);
+                driver.Navigate().GoToUrl(SettingsService.AccountUrl);
                 driver.FindElement(By.XPath("//a[@data-rid=\"10003\" and @class=\"VZLjze Wvetm zCVEd EhlvJf\"]")).Click();
                 driver.FindElement(By.XPath("//a[@href=\"name\"]")).Click();
                 var nameField = driver.FindElements(By.XPath("//input[@class=\"VfPpkd-fmcmS-wGMbrd CtvUB\"]"))[0];

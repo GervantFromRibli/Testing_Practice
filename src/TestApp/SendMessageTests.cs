@@ -8,7 +8,6 @@ using System;
 using System.Threading;
 using TestApp.Models;
 using TestApp.Services;
-using TestApp.Settings;
 using TestApp.Utils;
 
 namespace TestApp
@@ -27,12 +26,14 @@ namespace TestApp
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            SettingsService.SetSettings();
+
             driverPath = PathUtil.GetPathToDriver();
 
             firstUserDriver = new ChromeDriver(driverPath);
             secondUserDriver = new ChromeDriver(driverPath);
-            firstUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
-            secondUserDriver.Manage().Timeouts().ImplicitWait = TestSettings.ImplicitWaitSpan;
+            firstUserDriver.Manage().Timeouts().ImplicitWait = SettingsService.ImplicitWaitSpan;
+            secondUserDriver.Manage().Timeouts().ImplicitWait = SettingsService.ImplicitWaitSpan;
 
             Logger = LoggerManager.GetLogger();
         }
@@ -55,17 +56,17 @@ namespace TestApp
         public void SendMessage_WhenAllDataAreValid_ShouldSendAndReceiveMessages()
         {
             // Arrange
-            var firstUser = CreateUserService.CreateUserWithCredentials(TestSettings.FirstUserEmail, TestSettings.FirstUserPassword);
-            var secondUser = CreateUserService.CreateUserWithCredentials(TestSettings.SecondUserEmail, TestSettings.SecondUserPassword);
+            var firstUser = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, SettingsService.FirstUserPassword);
+            var secondUser = CreateUserService.CreateUserWithCredentials(SettingsService.SecondUserEmail, SettingsService.SecondUserPassword);
             var firstMessage = new Message
             {
-                MessageText = TestSettings.MessageToSend,
-                ReceiverEmail = TestSettings.SecondUserEmail
+                MessageText = SettingsService.MessageToSend,
+                ReceiverEmail = SettingsService.SecondUserEmail
             };
             var secondMessage = new Message
             {
-                MessageText = TestSettings.NewPseudonym,
-                ReceiverEmail = TestSettings.FirstUserEmail
+                MessageText = SettingsService.NewPseudonym,
+                ReceiverEmail = SettingsService.FirstUserEmail
             };
 
             firstUserDriver.GmailLogin(firstUser);
@@ -87,7 +88,7 @@ namespace TestApp
             }
 
             // Assert 1
-            message.Should().BeEquivalentTo(TestSettings.MessageToSend);
+            message.Should().BeEquivalentTo(SettingsService.MessageToSend);
 
             // Act 2
             try
@@ -105,7 +106,7 @@ namespace TestApp
             }
             
             // Assert 2
-            message.Should().BeEquivalentTo(TestSettings.NewPseudonym);
+            message.Should().BeEquivalentTo(SettingsService.NewPseudonym);
             
         }
     }
