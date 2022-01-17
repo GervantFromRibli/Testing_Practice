@@ -26,7 +26,7 @@ namespace TestApp.Services
 
         public static string MessageToSend { get; private set; } = "Hello; brother in test!";
 
-        public static string MailLoginUrl { get; private set; } = "https://mail.ru/";
+        public static string MailLoginUrl { get; private set; } = "https://account.mail.ru/";
 
         public static string MailUrl { get; private set; } = "https://e.mail.ru/inbox/";
 

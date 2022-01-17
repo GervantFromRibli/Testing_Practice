@@ -19,6 +19,9 @@ namespace TestApp.Services
 
                 driver.FindElement(By.XPath("//div[@class=\"T-I T-I-KE L3\"]")).Click();
 
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                wait.Until(ExpectedConditions.ElementExists(By.XPath("//textarea[@name=\"to\"]")));
+
                 driver.FindElement(By.XPath("//textarea[@name=\"to\"]")).SendKeys(message.ReceiverEmail);
                 driver.FindElement(By.XPath("//div[@class=\"Am Al editable LW-avf tS-tW\"]")).SendKeys(message.MessageText);
                 driver.FindElement(By.XPath("//div[@class=\"T-I J-J5-Ji aoO v7 T-I-atl L3\"]")).Click();
@@ -63,7 +66,7 @@ namespace TestApp.Services
                 driver.Navigate().GoToUrl(SettingsService.MailUrl);
 
                 var wait = new WebDriverWait(driver, SettingsService.ImplicitWaitSpan);
-                wait.Until(ExpectedConditions.UrlContains(SettingsService.MailUrl));
+                wait.Until(ExpectedConditions.ElementExists(By.XPath("//span[@class=\"llc__snippet\"]")));
 
                 message = driver.FindElements(By.XPath("//span[@class=\"llc__snippet\"]"))[0].GetAttribute("innerText");
                 logger.Info("Message read successfully.");

@@ -3,13 +3,14 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
+using System.Threading;
 using TestApp.Models;
 
 namespace TestApp.Services
 {
     public static class LoginService
     {
-        private static Logger logger = LoggerManager.GetLogger();
+        private static readonly Logger logger = LoggerManager.GetLogger();
 
         public static IWebDriver GmailLogin(this IWebDriver driver, User user)
         {
@@ -92,10 +93,13 @@ namespace TestApp.Services
             {
                 driver.Navigate().GoToUrl(SettingsService.MailLoginUrl);
 
-                driver.FindElement(By.XPath("//input[@name=\"login\"]")).SendKeys(user.Login);
-                driver.FindElement(By.XPath("//button[@data-testid=\"enter-password\"]")).Click();
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+                wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//input[@name=\"username\"]")));
+                driver.FindElement(By.XPath("//input[@name=\"username\"]")).SendKeys(user.Login);
+                driver.FindElement(By.XPath("//button[@data-test-id=\"next-button\"]")).Click();
+                wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//input[@name=\"password\"]")));
                 driver.FindElement(By.XPath("//input[@name=\"password\"]")).SendKeys(user.Password);
-                driver.FindElement(By.XPath("//button[@data-testid=\"login-to-mail\"]")).Click();
+                driver.FindElement(By.XPath("//button[@data-test-id=\"submit-button\"]")).Click();
 
                 logger.Info($"User {user.Login} successfully logged in.");
             }
