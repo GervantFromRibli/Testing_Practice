@@ -17,7 +17,7 @@ namespace TestApp.Driver
             {
                 driver = new ChromeDriver(PathUtil.GetPathToDriver());
                 driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-                driver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
+                driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(30);
                 driver.Manage().Window.Maximize();
             }
 

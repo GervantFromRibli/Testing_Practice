@@ -8,6 +8,7 @@ using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
 using System.Threading;
+using TestApp.Pages;
 using TestApp.Services;
 using TestApp.Tests;
 using TestApp.Utils;
@@ -24,36 +25,34 @@ namespace TestApp
             var expectedWelcome = "Добро пожаловать, " + SettingsService.NewPseudonym + " TestSurname!";
 
             var user = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, SettingsService.FirstUserPassword);
-
-            Driver.GmailLogin(user);
-
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-
-            string welcome = string.Empty;
+            var accountPage = new GmailLoginPage(Driver).
+                OpenPage().
+                Login(user);
 
             // Act
-            var newNickName = Driver.ReadGmailMessage();
+            var newNickName = new GmailPage(Driver).OpenPage().ReadNewMessage();
 
-            Driver.ChangeGmailAccountNickName(newNickName);
+            accountPage.
+                OpenPage().
+                ChangeNickname(newNickName);
 
             Thread.Sleep(1000);
-            Driver.Navigate().GoToUrl(SettingsService.AccountUrl);
-            wait.Until(ExpectedConditions.ElementExists(By.XPath("//h1[@class=\"x7WrMb\"]")));
 
-            welcome = Driver.FindElement(By.XPath("//h1[@class=\"x7WrMb\"]")).GetAttribute("innerHTML");
+            var welcome = accountPage.OpenPage().ReadWelcomeMessage();
 
             // Assert
             welcome.Should().BeEquivalentTo(expectedWelcome);
 
             // Act 2
             expectedWelcome = "Добро пожаловать, " + SettingsService.OldNickName + " TestSurname!";
-            Driver.ChangeGmailAccountNickName(SettingsService.OldNickName);
+
+            accountPage.
+                OpenPage().
+                ChangeNickname(SettingsService.OldNickName);
 
             Thread.Sleep(1000);
-            Driver.Navigate().GoToUrl(SettingsService.AccountUrl);
-            wait.Until(ExpectedConditions.ElementExists(By.XPath("//h1[@class=\"x7WrMb\"]")));
 
-            welcome = Driver.FindElement(By.XPath("//h1[@class=\"x7WrMb\"]")).GetAttribute("innerHTML");
+            welcome = accountPage.OpenPage().ReadWelcomeMessage();
 
             // Assert
             welcome.Should().BeEquivalentTo(expectedWelcome);

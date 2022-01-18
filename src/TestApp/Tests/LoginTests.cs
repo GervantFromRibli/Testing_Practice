@@ -3,6 +3,7 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
+using TestApp.Pages;
 using TestApp.Services;
 using TestApp.Tests;
 using TestApp.Utils;
@@ -17,12 +18,16 @@ namespace TestApp
         {
             // Arrange
             var user = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, SettingsService.FirstUserPassword);
+            var loginPage = new GmailLoginPage(Driver);
 
             // Act
-            Driver.GmailLogin(user);
+            var url = loginPage.
+                OpenPage().
+                Login(user).
+                GetCurrentUrl();
 
             // Assert
-            Driver.Url.Should().BeEquivalentTo(SettingsService.ExpectedAccountUrl);
+            url.Should().BeEquivalentTo(SettingsService.ExpectedAccountUrl);
         }
 
         [Test]
@@ -30,14 +35,13 @@ namespace TestApp
         {
             // Arrange
             var user = CreateUserService.CreateUserWithNoLoginAndPassword();
-
-            IWebElement warning = null;
+            var loginPage = new GmailLoginPage(Driver);
 
             // Act
-            Driver.GmailLoginWithoutPassword(user);
-
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-            warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@class=\"o6cuMc\"]")));
+            var warning = loginPage.
+                OpenPage().
+                LoginWithoutPassword(user).
+                GetEmailWarning();
 
             // Assert
             warning.Text.Should().BeEquivalentTo("Введите адрес электронной почты или номер телефона.");
@@ -48,14 +52,13 @@ namespace TestApp
         {
             // Arrange
             var user = CreateUserService.CreateUserWithNoPassword(SettingsService.FirstUserEmail);
-
-            IWebElement warning = null;
+            var loginPage = new GmailLoginPage(Driver);
 
             // Act
-            Driver.GmailLoginWithoutRedirection(user);
-
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-            warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@jsname=\"B34EJ\"]/child::span")));
+            var warning = loginPage.
+                OpenPage().
+                LoginWithoutRedirection(user).
+                GetPasswordWarning();
 
             // Assert
             warning.Text.Should().BeEquivalentTo("Введите пароль");
@@ -66,18 +69,16 @@ namespace TestApp
         {
             // Arrange
             var user = CreateUserService.CreateUserWithNoPassword(TestStringUtil.GenerateString());
-
-            bool isWarningExist = false;
+            var loginPage = new GmailLoginPage(Driver);
 
             // Act
-            Driver.GmailLoginWithoutPassword(user);
-
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-            isWarningExist = wait.Until(e => e.FindElement(By.XPath("//div[@class=\"o6cuMc\"]")).
-                GetAttribute("innerText").Contains("Не удалось найти аккаунт Google."));
+            var warning = loginPage.
+                OpenPage().
+                LoginWithoutPassword(user).
+                GetEmailWarning();
 
             // Assert
-            isWarningExist.Should().BeTrue();
+            warning.Text.Should().BeEquivalentTo("Не удалось найти аккаунт Google.");
         }
 
         [Test]
@@ -85,14 +86,13 @@ namespace TestApp
         {
             // Arrange
             var user = CreateUserService.CreateUserWithCredentials(SettingsService.FirstUserEmail, TestStringUtil.GenerateString());
-
-            IWebElement warning = null;
+            var loginPage = new GmailLoginPage(Driver);
 
             // Act
-            Driver.GmailLoginWithoutRedirection(user);
-
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-            warning = wait.Until(ExpectedConditions.ElementExists(By.XPath("//div[@jsname=\"B34EJ\"]/child::span")));
+            var warning = loginPage.
+                OpenPage().
+                LoginWithoutRedirection(user).
+                GetPasswordWarning();
 
             // Assert
             warning.Text.Should().BeEquivalentTo("Неверный пароль. Повторите попытку или нажмите на ссылку \"Забыли пароль?\", чтобы сбросить его.");

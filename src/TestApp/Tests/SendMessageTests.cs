@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Threading;
 using TestApp.Models;
+using TestApp.Pages;
 using TestApp.Services;
 using TestApp.Tests;
 
@@ -28,27 +29,32 @@ namespace TestApp
             };
 
             // Act 1
-            Driver.GmailLogin(firstUser);
+            var gmailPage = new GmailLoginPage(Driver).
+                OpenPage().
+                Login(firstUser).
+                GoToMailPage();
 
-            string message;
-
-            Driver.GmailSendMessage(firstMessage);
+            gmailPage.SendMessage(firstMessage);
 
             Thread.Sleep(15000);
-            Driver.MailLogin(secondUser);
 
-            message = Driver.ReadMailMessage();
+            var mailPage = new MailLoginPage(Driver).
+                OpenPage().
+                Login(secondUser);
+
+            var message = mailPage.ReadNewMessage();
 
             // Assert 1
             message.Should().BeEquivalentTo(SettingsService.MessageToSend);
 
             // Act 2
-            Thread.Sleep(2000);
-            Driver.MailSendMessage(secondMessage);
+            mailPage.SendMessage(secondMessage);
 
             Thread.Sleep(70000);
 
-            message = Driver.ReadGmailMessage();
+            message = new GmailPage(Driver).
+                OpenPage().
+                ReadNewMessage();
 
             // Assert 2
             message.Should().BeEquivalentTo(SettingsService.NewPseudonym);
