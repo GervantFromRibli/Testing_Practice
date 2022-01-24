@@ -1,8 +1,8 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
+using System;
 using TestApp.Models;
 using TestApp.Services;
+using TestApp.Waiters;
 
 namespace TestApp.Pages
 {
@@ -20,6 +20,8 @@ namespace TestApp.Pages
 
         private readonly By _incomeMessageTextLocator = By.XPath("//div[@class=\"a3s aiL \"]/child::div[2]/div[1]");
 
+        private readonly By _newMessageTimeLocator = By.XPath("(//td[@class=\"xW xY \"])[1]");
+
         public GmailPage(IWebDriver driver) : base(driver)
         {
             BaseUrl = SettingsService.GmailUrl;
@@ -28,6 +30,7 @@ namespace TestApp.Pages
         public override GmailPage OpenPage()
         {
             Driver.Navigate().GoToUrl(BaseUrl);
+            Driver.WaitForUrlToBe(BaseUrl);
             return this;
         }
 
@@ -46,15 +49,25 @@ namespace TestApp.Pages
 
         public string ReadNewMessage()
         {
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
+            Driver.WaitForAllElementsToExist(_incomeMessageLocator, 6).Click();
 
-            Driver.FindElements(_incomeMessageLocator)[5].Click();
-
-            string message = wait.Until(ExpectedConditions.ElementIsVisible(_incomeMessageTextLocator)).Text;
+            string message = Driver.WaitForElementToBeVisible(_incomeMessageTextLocator).Text;
 
             logger.Info("Message read successfully.");
 
             return message;
+        }
+
+        public GmailPage WaitForNewMessage(int timeout)
+        {
+            var time = DateTime.Now;
+            var firstTimeToCheck = time.AddMinutes(-1).ToString("HH:mm");
+            var secondTimeToCheck = time.ToString("HH:mm");
+            var thirdTimeToCheck = time.AddMinutes(1).ToString("HH:mm");
+
+            Driver.WaitForOneOfThreeTextesToAppear(_newMessageTimeLocator, firstTimeToCheck, secondTimeToCheck, thirdTimeToCheck, timeout);
+
+            return this;
         }
     }
 }

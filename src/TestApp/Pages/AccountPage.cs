@@ -1,7 +1,7 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
+using OpenQA.Selenium.Interactions;
 using TestApp.Services;
+using TestApp.Waiters;
 
 namespace TestApp.Pages
 {
@@ -23,6 +23,7 @@ namespace TestApp.Pages
         public override AccountPage OpenPage()
         {
             Driver.Navigate().GoToUrl(BaseUrl);
+            Driver.WaitForUrlToBe(BaseUrl);
             return this;
         }
 
@@ -43,9 +44,7 @@ namespace TestApp.Pages
 
         public string ReadWelcomeMessage()
         {
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-
-            var welcome = wait.Until(ExpectedConditions.ElementExists(_welcomeMessageLocator)).Text;
+            var welcome = Driver.WaitForElementToExist(_welcomeMessageLocator).Text;
 
             return welcome;
         }

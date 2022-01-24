@@ -1,9 +1,7 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
-using System;
 using TestApp.Models;
 using TestApp.Services;
+using TestApp.Waiters;
 
 namespace TestApp.Pages
 {
@@ -30,6 +28,7 @@ namespace TestApp.Pages
         public override GmailLoginPage OpenPage()
         {
             Driver.Navigate().GoToUrl(BaseUrl);
+            Driver.WaitForUrlToBe(BaseUrl);
             return this;
         }
 
@@ -39,13 +38,11 @@ namespace TestApp.Pages
 
             Driver.FindElement(_submitLocator).Click();
 
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
-
-            var password = wait.Until(ExpectedConditions.ElementToBeClickable(_passwordLocator));
+            var password = Driver.WaitForElementToBeClickable(_passwordLocator);
             password.SendKeys(user.Password);
             password.SendKeys(Keys.Enter);
 
-            wait.Until(ExpectedConditions.UrlContains(AccountUrl));
+            Driver.WaitForUrlToBe(AccountUrl);
 
             logger.Info($"User {user.Login} successfully logged in.");
 
@@ -58,9 +55,7 @@ namespace TestApp.Pages
 
             Driver.FindElement(_submitLocator).Click();
 
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
-
-            var password = wait.Until(ExpectedConditions.ElementToBeClickable(_passwordLocator));
+            var password = Driver.WaitForElementToBeClickable(_passwordLocator);
             password.SendKeys(user.Password);
             password.SendKeys(Keys.Enter);
 
@@ -82,16 +77,12 @@ namespace TestApp.Pages
 
         public IWebElement GetEmailWarning()
         {
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-            var warning = wait.Until(ExpectedConditions.ElementExists(_emailWarningLocator));
-            return warning;
+            return Driver.WaitForElementToExist(_emailWarningLocator);
         }
 
         public IWebElement GetPasswordWarning()
         {
-            var wait = new WebDriverWait(Driver, SettingsService.ImplicitWaitSpan);
-            var warning = wait.Until(ExpectedConditions.ElementExists(_passwordWarningLocator));
-            return warning;
+            return Driver.WaitForElementToExist(_passwordWarningLocator);
         }
     }
 }

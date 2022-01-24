@@ -32,6 +32,8 @@ namespace TestApp
             // Act
             var newNickName = new GmailPage(Driver).OpenPage().ReadNewMessage();
 
+            Thread.Sleep(2000);
+
             accountPage.
                 OpenPage().
                 ChangeNickname(newNickName);

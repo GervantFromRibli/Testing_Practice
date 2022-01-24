@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using OpenQA.Selenium.Interactions;
 using System.Threading;
 using TestApp.Models;
 using TestApp.Pages;
@@ -36,11 +37,11 @@ namespace TestApp
 
             gmailPage.SendMessage(firstMessage);
 
-            Thread.Sleep(15000);
+            Thread.Sleep(2000);
 
             var mailPage = new MailLoginPage(Driver).
                 OpenPage().
-                Login(secondUser);
+                Login(secondUser).WaitForNewMessage(40);
 
             var message = mailPage.ReadNewMessage();
 
@@ -50,10 +51,11 @@ namespace TestApp
             // Act 2
             mailPage.SendMessage(secondMessage);
 
-            Thread.Sleep(70000);
+            Thread.Sleep(1000);
 
             message = new GmailPage(Driver).
                 OpenPage().
+                WaitForNewMessage(60).
                 ReadNewMessage();
 
             // Assert 2

@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using TestApp.Models;
 using TestApp.Services;
+using TestApp.Waiters;
 
 namespace TestApp.Pages
 {
@@ -22,6 +23,7 @@ namespace TestApp.Pages
         public override MailLoginPage OpenPage()
         {
             Driver.Navigate().GoToUrl(BaseUrl);
+            Driver.WaitForUrlToBe(BaseUrl);
             return this;
         }
 

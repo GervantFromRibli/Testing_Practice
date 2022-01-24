@@ -2,6 +2,7 @@
 using System;
 using TestApp.Models;
 using TestApp.Services;
+using TestApp.Waiters;
 
 namespace TestApp.Pages
 {
@@ -17,6 +18,8 @@ namespace TestApp.Pages
 
         private readonly By _incomeMessageLocator = By.XPath("//span[@class=\"llc__snippet\"]");
 
+        private readonly By _newMessageTimeLocator = By.XPath("(//div[@class=\"llc__item llc__item_date\"])[1]");
+
         public MailPage(IWebDriver driver) : base(driver)
         {
             BaseUrl = SettingsService.MailUrl;
@@ -25,6 +28,7 @@ namespace TestApp.Pages
         public override MailPage OpenPage()
         {
             Driver.Navigate().GoToUrl(BaseUrl);
+            Driver.WaitForUrlToBe(BaseUrl);
             return this;
         }
 
@@ -49,6 +53,18 @@ namespace TestApp.Pages
             logger.Info("Message read successfully.");
 
             return message;
+        }
+
+        public MailPage WaitForNewMessage(int timeout)
+        {
+            var time = DateTime.Now;
+            var firstTimeToCheck = time.AddMinutes(-1).ToString("HH:mm");
+            var secondTimeToCheck = time.ToString("HH:mm");
+            var thirdTimeToCheck = time.AddMinutes(1).ToString("HH:mm");
+
+            Driver.WaitForOneOfThreeTextesToAppear(_newMessageTimeLocator, firstTimeToCheck, secondTimeToCheck, thirdTimeToCheck, timeout);
+
+            return this;
         }
     }
 }
