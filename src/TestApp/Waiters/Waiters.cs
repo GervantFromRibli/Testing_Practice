@@ -54,5 +54,29 @@ namespace TestApp.Waiters
                 Until(e => e.FindElement(locator).Text.Contains(firstText) ||
                 e.FindElement(locator).Text.Contains(secondText) || e.FindElement(locator).Text.Contains(thirdText));
         }
+
+        public static string WaitForTextWithRefresh(this IWebDriver driver, By locator, string expectedText, int timeout)
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
+            var isTextPresent = wait.Until(e => e.FindElement(locator).Text.Equals(expectedText));
+            if (!isTextPresent)
+            {
+                driver.Navigate().Refresh();
+            }
+
+            return driver.FindElement(locator).Text;
+        }
+
+        public static void WaitForSomeTime(this IWebDriver driver)
+        {
+            var wait = new DefaultWait<IWebDriver>(driver)
+            {
+                Timeout = TimeSpan.FromSeconds(2)
+            };
+
+            wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException), typeof(NoAlertPresentException));
+
+            wait.Until(ExpectedConditions.AlertIsPresent());
+        }
     }
 }

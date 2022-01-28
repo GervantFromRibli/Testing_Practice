@@ -42,9 +42,9 @@ namespace TestApp.Pages
             return this;
         }
 
-        public string ReadWelcomeMessage()
+        public string ReadWelcomeMessage(string welcomeMessage)
         {
-            var welcome = Driver.WaitForElementToExist(_welcomeMessageLocator).Text;
+            var welcome = Driver.WaitForTextWithRefresh(_welcomeMessageLocator, welcomeMessage, 1);
 
             return welcome;
         }

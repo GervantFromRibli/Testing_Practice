@@ -37,8 +37,6 @@ namespace TestApp
 
             gmailPage.SendMessage(firstMessage);
 
-            Thread.Sleep(2000);
-
             var mailPage = new MailLoginPage(Driver).
                 OpenPage().
                 Login(secondUser).WaitForNewMessage(40);
@@ -50,8 +48,6 @@ namespace TestApp
 
             // Act 2
             mailPage.SendMessage(secondMessage);
-
-            Thread.Sleep(1000);
 
             message = new GmailPage(Driver).
                 OpenPage().

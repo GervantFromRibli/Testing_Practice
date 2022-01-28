@@ -40,6 +40,8 @@ namespace TestApp.Pages
             Driver.FindElements(_messageTextLocator)[0].SendKeys(message.MessageText);
             Driver.FindElement(_sendMessageLocator).Click();
 
+            Driver.WaitForSomeTime();
+
             logger.Info("Message sent successfully.");
 
             return this;

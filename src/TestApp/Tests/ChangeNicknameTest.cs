@@ -32,15 +32,11 @@ namespace TestApp
             // Act
             var newNickName = new GmailPage(Driver).OpenPage().ReadNewMessage();
 
-            Thread.Sleep(2000);
-
             accountPage.
                 OpenPage().
                 ChangeNickname(newNickName);
 
-            Thread.Sleep(1000);
-
-            var welcome = accountPage.OpenPage().ReadWelcomeMessage();
+            var welcome = accountPage.OpenPage().ReadWelcomeMessage(expectedWelcome);
 
             // Assert
             welcome.Should().BeEquivalentTo(expectedWelcome);
@@ -52,9 +48,7 @@ namespace TestApp
                 OpenPage().
                 ChangeNickname(SettingsService.OldNickName);
 
-            Thread.Sleep(1000);
-
-            welcome = accountPage.OpenPage().ReadWelcomeMessage();
+            welcome = accountPage.OpenPage().ReadWelcomeMessage(expectedWelcome);
 
             // Assert
             welcome.Should().BeEquivalentTo(expectedWelcome);
